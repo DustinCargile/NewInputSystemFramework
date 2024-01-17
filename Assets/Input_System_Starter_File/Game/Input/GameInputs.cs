@@ -94,6 +94,54 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""Interactable"",
+            ""id"": ""18a982e5-58b0-4e75-ac9c-189f128589ec"",
+            ""actions"": [
+                {
+                    ""name"": ""Interaction"",
+                    ""type"": ""Button"",
+                    ""id"": ""68c81d40-17e9-4b00-8232-6d1458241334"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Escape"",
+                    ""type"": ""Button"",
+                    ""id"": ""2d28cbe0-06a4-4509-8ead-1328a7c0783c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""862a4ea2-7e31-4f03-b541-39442cde2a3f"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interaction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b4ae5ba5-a56b-456d-9e9c-b5599d0d0984"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Escape"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -101,6 +149,10 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
+        // Interactable
+        m_Interactable = asset.FindActionMap("Interactable", throwIfNotFound: true);
+        m_Interactable_Interaction = m_Interactable.FindAction("Interaction", throwIfNotFound: true);
+        m_Interactable_Escape = m_Interactable.FindAction("Escape", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -204,8 +256,67 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Interactable
+    private readonly InputActionMap m_Interactable;
+    private List<IInteractableActions> m_InteractableActionsCallbackInterfaces = new List<IInteractableActions>();
+    private readonly InputAction m_Interactable_Interaction;
+    private readonly InputAction m_Interactable_Escape;
+    public struct InteractableActions
+    {
+        private @GameInputs m_Wrapper;
+        public InteractableActions(@GameInputs wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Interaction => m_Wrapper.m_Interactable_Interaction;
+        public InputAction @Escape => m_Wrapper.m_Interactable_Escape;
+        public InputActionMap Get() { return m_Wrapper.m_Interactable; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(InteractableActions set) { return set.Get(); }
+        public void AddCallbacks(IInteractableActions instance)
+        {
+            if (instance == null || m_Wrapper.m_InteractableActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_InteractableActionsCallbackInterfaces.Add(instance);
+            @Interaction.started += instance.OnInteraction;
+            @Interaction.performed += instance.OnInteraction;
+            @Interaction.canceled += instance.OnInteraction;
+            @Escape.started += instance.OnEscape;
+            @Escape.performed += instance.OnEscape;
+            @Escape.canceled += instance.OnEscape;
+        }
+
+        private void UnregisterCallbacks(IInteractableActions instance)
+        {
+            @Interaction.started -= instance.OnInteraction;
+            @Interaction.performed -= instance.OnInteraction;
+            @Interaction.canceled -= instance.OnInteraction;
+            @Escape.started -= instance.OnEscape;
+            @Escape.performed -= instance.OnEscape;
+            @Escape.canceled -= instance.OnEscape;
+        }
+
+        public void RemoveCallbacks(IInteractableActions instance)
+        {
+            if (m_Wrapper.m_InteractableActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IInteractableActions instance)
+        {
+            foreach (var item in m_Wrapper.m_InteractableActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_InteractableActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public InteractableActions @Interactable => new InteractableActions(this);
     public interface IPlayerActions
     {
         void OnMovement(InputAction.CallbackContext context);
+    }
+    public interface IInteractableActions
+    {
+        void OnInteraction(InputAction.CallbackContext context);
+        void OnEscape(InputAction.CallbackContext context);
     }
 }

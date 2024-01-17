@@ -23,37 +23,52 @@ namespace Game.Scripts.LiveObjects
         public static event Action onHackComplete;
         public static event Action onHackEnded;
 
+        private GameInputs _input;
+
         private void OnEnable()
         {
             InteractableZone.onHoldStarted += InteractableZone_onHoldStarted;
             InteractableZone.onHoldEnded += InteractableZone_onHoldEnded;
         }
 
+        private void Start()
+        {
+            _input = new GameInputs();
+            _input.Interactable.Enable();
+            _input.Interactable.Interaction.performed += Interaction_performed;
+            _input.Interactable.Escape.performed += Escape_performed;
+        }
+
+        private void Escape_performed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+        {
+            if (_hacked)
+            {
+                _hacked = false;
+                onHackEnded?.Invoke();
+                ResetCameras();
+            }
+        }
+
+        private void Interaction_performed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+        {
+            
+            if (_hacked)
+            {
+                var previous = _activeCamera;
+                _activeCamera++;
+
+
+                if (_activeCamera >= _cameras.Length)
+                    _activeCamera = 0;
+
+
+                _cameras[_activeCamera].Priority = 11;
+                _cameras[previous].Priority = 9;
+            }
+        }
+
         private void Update()
         {
-            if (_hacked == true)
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    var previous = _activeCamera;
-                    _activeCamera++;
-
-
-                    if (_activeCamera >= _cameras.Length)
-                        _activeCamera = 0;
-
-
-                    _cameras[_activeCamera].Priority = 11;
-                    _cameras[previous].Priority = 9;
-                }
-
-                if (Input.GetKeyDown(KeyCode.Escape))
-                {
-                    _hacked = false;
-                    onHackEnded?.Invoke();
-                    ResetCameras();
-                }
-            }
         }
 
         void ResetCameras()
