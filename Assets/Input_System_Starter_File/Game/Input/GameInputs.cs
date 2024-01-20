@@ -173,6 +173,15 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Escape"",
+                    ""type"": ""Button"",
+                    ""id"": ""2a12b7e8-5a6a-42ce-abf1-3c9eb59bfa10"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -296,6 +305,17 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
                     ""action"": ""Thrust"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0d059ec5-4b4b-4b51-b895-1e870ade946f"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Escape"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -314,6 +334,7 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
         m_Drone_Movement = m_Drone.FindAction("Movement", throwIfNotFound: true);
         m_Drone_Rotate = m_Drone.FindAction("Rotate", throwIfNotFound: true);
         m_Drone_Thrust = m_Drone.FindAction("Thrust", throwIfNotFound: true);
+        m_Drone_Escape = m_Drone.FindAction("Escape", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -478,6 +499,7 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
     private readonly InputAction m_Drone_Movement;
     private readonly InputAction m_Drone_Rotate;
     private readonly InputAction m_Drone_Thrust;
+    private readonly InputAction m_Drone_Escape;
     public struct DroneActions
     {
         private @GameInputs m_Wrapper;
@@ -485,6 +507,7 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
         public InputAction @Movement => m_Wrapper.m_Drone_Movement;
         public InputAction @Rotate => m_Wrapper.m_Drone_Rotate;
         public InputAction @Thrust => m_Wrapper.m_Drone_Thrust;
+        public InputAction @Escape => m_Wrapper.m_Drone_Escape;
         public InputActionMap Get() { return m_Wrapper.m_Drone; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -503,6 +526,9 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
             @Thrust.started += instance.OnThrust;
             @Thrust.performed += instance.OnThrust;
             @Thrust.canceled += instance.OnThrust;
+            @Escape.started += instance.OnEscape;
+            @Escape.performed += instance.OnEscape;
+            @Escape.canceled += instance.OnEscape;
         }
 
         private void UnregisterCallbacks(IDroneActions instance)
@@ -516,6 +542,9 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
             @Thrust.started -= instance.OnThrust;
             @Thrust.performed -= instance.OnThrust;
             @Thrust.canceled -= instance.OnThrust;
+            @Escape.started -= instance.OnEscape;
+            @Escape.performed -= instance.OnEscape;
+            @Escape.canceled -= instance.OnEscape;
         }
 
         public void RemoveCallbacks(IDroneActions instance)
@@ -547,5 +576,6 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
         void OnMovement(InputAction.CallbackContext context);
         void OnRotate(InputAction.CallbackContext context);
         void OnThrust(InputAction.CallbackContext context);
+        void OnEscape(InputAction.CallbackContext context);
     }
 }

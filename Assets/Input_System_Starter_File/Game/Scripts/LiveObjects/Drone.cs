@@ -51,7 +51,7 @@ namespace Game.Scripts.LiveObjects
                 OnEnterFlightMode?.Invoke();
                 UIManager.Instance.DroneView(true);
                 _interactableZone.CompleteTask(4);
-                _input.Player.Disable();
+               
                 _input.Drone.Enable();
             }
         }
@@ -62,23 +62,12 @@ namespace Game.Scripts.LiveObjects
             _inFlightMode = false;
             UIManager.Instance.DroneView(false);
             _input.Drone.Disable();
-            _input.Player.Enable();
+            
         }
 
         private void Update()
         {
-            if (_inFlightMode)
-            {
-                //CalculateTilt();
-                CalculateMovementUpdate();
-
-                if (Input.GetKeyDown(KeyCode.Escape))
-                {
-                    _inFlightMode = false;
-                    onExitFlightmode?.Invoke();
-                    ExitFlightMode();
-                }
-            }
+            
         }
 
         private void FixedUpdate()
@@ -88,28 +77,24 @@ namespace Game.Scripts.LiveObjects
         
         }
 
-        private void CalculateMovementUpdate()
-        {
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                var tempRot = transform.localRotation.eulerAngles;
-                tempRot.y -= _speed / 3;
-                transform.localRotation = Quaternion.Euler(tempRot);
-            }
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                var tempRot = transform.localRotation.eulerAngles;
-                tempRot.y += _speed / 3;
-                transform.localRotation = Quaternion.Euler(tempRot);
-            }
-        }
-
-   
+       
 
         public void UpAndDownThrust(float direction) 
         {
-            if(_inFlightMode)
+            if (_inFlightMode) 
+            {
                 _rigidbody.AddForce(transform.up * _speed * direction, ForceMode.Acceleration);
+            }
+                
+        }
+        public void Rotate(float direction) 
+        {
+            if (_inFlightMode) 
+            {
+                var tempRot = transform.localRotation.eulerAngles;
+                tempRot.y += direction * (_speed / 3);
+                transform.localRotation = Quaternion.Euler(tempRot);
+            }
         }
 
         /*private void CalculateTilt()
@@ -127,7 +112,22 @@ namespace Game.Scripts.LiveObjects
         }*/
         public void Move(Vector2 direction)
         {
-            transform.Translate(direction * _speed * Time.deltaTime);
+            if (_inFlightMode) 
+            {   
+
+                var move = new Vector3(direction.y,0,direction.x);
+                _rigidbody.AddForce(direction * _speed, ForceMode.Acceleration);
+                
+                transform.rotation = Quaternion.Euler(move.x * 30,transform.localRotation.eulerAngles.y,-move.z * 30);
+            }
+
+                
+        }
+        public void EscapePressed() 
+        {
+            _inFlightMode = false;
+            onExitFlightmode?.Invoke();
+            ExitFlightMode();
         }
 
         private void OnDisable()
