@@ -40,7 +40,7 @@ namespace Game.Scripts.LiveObjects
             }
         }
 
-        private void ExitDriveMode()
+        public void ExitDriveMode()
         {
             _inDriveMode = false;
             _forkliftCam.Priority = 9;            
@@ -51,41 +51,41 @@ namespace Game.Scripts.LiveObjects
 
         private void Update()
         {
-            if (_inDriveMode == true)
-            {
-                LiftControls();
-                CalcutateMovement();
-                if (Input.GetKeyDown(KeyCode.Escape))
-                    ExitDriveMode();
-            }
+          
 
         }
 
-        private void CalcutateMovement()
+        public void Move(Vector2 move)
         {
-            float h = Input.GetAxisRaw("Horizontal");
-            float v = Input.GetAxisRaw("Vertical");
-            var direction = new Vector3(0, 0, v);
-            var velocity = direction * _speed;
-
-            transform.Translate(velocity * Time.deltaTime);
-
-            if (Mathf.Abs(v) > 0)
+            if (_inDriveMode) 
             {
-                var tempRot = transform.rotation.eulerAngles;
-                tempRot.y += h * _speed / 2;
-                transform.rotation = Quaternion.Euler(tempRot);
+                float h = move.x;
+                float v = move.y;
+                var direction = new Vector3(0, 0, v);
+                var velocity = direction * _speed;
+
+                transform.Translate(velocity * Time.deltaTime);
+
+                if (Mathf.Abs(v) > 0)
+                {
+                    var tempRot = transform.rotation.eulerAngles;
+                    tempRot.y += h * _speed / 2;
+                    transform.rotation = Quaternion.Euler(tempRot);
+                }
             }
         }
 
-        private void LiftControls()
+        public void LiftControls(float direction)
         {
-            if (Input.GetKey(KeyCode.R))
-                LiftUpRoutine();
-            else if (Input.GetKey(KeyCode.T))
-                LiftDownRoutine();
+            if (_inDriveMode) 
+            {
+                if (direction > 0)
+                    LiftUpRoutine();
+                else if (direction < 0)
+                    LiftDownRoutine();
+            }
         }
-
+        
         private void LiftUpRoutine()
         {
             if (_lift.transform.localPosition.y < _liftUpperLimit.y)

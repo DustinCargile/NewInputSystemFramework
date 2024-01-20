@@ -21,6 +21,9 @@ public class PlayerInput : MonoBehaviour
         Drone.OnEnterFlightMode += DisablePlayerControl;
         Drone.onExitFlightmode += EnablePlayerControl;
 
+        Forklift.onDriveModeEntered += DisablePlayerControl;
+        Forklift.onDriveModeExited += EnablePlayerControl;
+
     }
 
     // Update is called once per frame
@@ -44,5 +47,8 @@ public class PlayerInput : MonoBehaviour
     {
         Drone.OnEnterFlightMode -= DisablePlayerControl;
         Drone.onExitFlightmode -= EnablePlayerControl;
+
+        Forklift.onDriveModeEntered -= DisablePlayerControl;
+        Forklift.onDriveModeExited -= EnablePlayerControl;
     }
 }
