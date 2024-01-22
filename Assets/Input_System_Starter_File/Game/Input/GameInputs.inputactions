@@ -101,7 +101,7 @@
                     "name": "",
                     "id": "862a4ea2-7e31-4f03-b541-39442cde2a3f",
                     "path": "<Keyboard>/e",
-                    "interactions": "",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "",
                     "action": "Interaction",

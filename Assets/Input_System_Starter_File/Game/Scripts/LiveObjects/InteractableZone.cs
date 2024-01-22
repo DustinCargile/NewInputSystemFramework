@@ -67,6 +67,7 @@ namespace Game.Scripts.LiveObjects
         public static event Action<InteractableZone> onZoneInteractionComplete;
         public static event Action<int> onHoldStarted;
         public static event Action<int> onHoldEnded;
+        public static event Action<InteractableZone> OnHoldFinished;
 
         private void OnEnable()
         {
@@ -85,8 +86,13 @@ namespace Game.Scripts.LiveObjects
 
         private void Interaction_canceled(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
+            Debug.Log("Zone ID: " + _currentZoneID);
             _inHoldState = false;
             onHoldEnded?.Invoke(_zoneID);
+            if (_currentZoneID == 6) 
+            {
+                OnHoldFinished?.Invoke(this);
+            }
         }
 
         private void Interaction_performed(UnityEngine.InputSystem.InputAction.CallbackContext context)

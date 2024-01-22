@@ -15,29 +15,51 @@ namespace Game.Scripts.LiveObjects
 
         private List<Rigidbody> _brakeOff = new List<Rigidbody>();
 
+        private InteractableZone _zone;
+        
+        
+        private float _holdTime = 0;
+        private float _maxHoldTime = 5f;
+
+        private bool _holding = false;
         private void OnEnable()
         {
+            InteractableZone.OnHoldFinished += BreakCrate;
             InteractableZone.onZoneInteractionComplete += InteractableZone_onZoneInteractionComplete;
+            
         }
 
         private void InteractableZone_onZoneInteractionComplete(InteractableZone zone)
         {
+            _zone = zone;
+            _holding = true;
+            Debug.Log("Holding: " + _holding);
+        }
+
+    
+
+        private void BreakCrate(InteractableZone zone)
+        {
+            _zone = zone;
             
-            if (_isReadyToBreak == false && _brakeOff.Count >0)
+            _holding = false ;
+            if (_isReadyToBreak == false && _brakeOff.Count > 0)
             {
+                
+
                 _wholeCrate.SetActive(false);
                 _brokenCrate.SetActive(true);
                 _isReadyToBreak = true;
             }
 
-            if (_isReadyToBreak && zone.GetZoneID() == 6) //Crate zone            
+            if (_isReadyToBreak && _zone.GetZoneID() == 6) //Crate zone            
             {
                 if (_brakeOff.Count > 0)
-                {
-                    BreakPart();
+                {                    
+                    BreakPart((int)_holdTime);
                     StartCoroutine(PunchDelay());
                 }
-                else if(_brakeOff.Count == 0)
+                else if (_brakeOff.Count == 0)
                 {
                     _isReadyToBreak = false;
                     _crateCollider.enabled = false;
@@ -45,6 +67,7 @@ namespace Game.Scripts.LiveObjects
                     Debug.Log("Completely Busted");
                 }
             }
+            _holdTime = 0;
         }
 
         private void Start()
@@ -52,15 +75,33 @@ namespace Game.Scripts.LiveObjects
             _brakeOff.AddRange(_pieces);
             
         }
-
-
-
-        public void BreakPart()
+        private void Update()
         {
-            int rng = Random.Range(0, _brakeOff.Count);
-            _brakeOff[rng].constraints = RigidbodyConstraints.None;
-            _brakeOff[rng].AddForce(new Vector3(1f, 1f, 1f), ForceMode.Force);
-            _brakeOff.Remove(_brakeOff[rng]);            
+            if (_holding)
+            {
+                _holdTime += Time.deltaTime;
+                _holdTime = Mathf.Clamp(_holdTime, 1, _maxHoldTime);
+                
+            }
+        }
+
+
+        public void BreakPart(int parts)
+        {
+            for (int i = 0; i <= parts; i++) 
+            {
+                if (_brakeOff.Count >= parts) 
+                {
+                    
+                    int rng = Random.Range(0, _brakeOff.Count);
+                    _brakeOff[rng].constraints = RigidbodyConstraints.None;
+                    _brakeOff[rng].AddForce(new Vector3(1f, 1f, 1f), ForceMode.Force);
+                    _brakeOff.Remove(_brakeOff[rng]);
+                     
+                }
+            }
+            
+                        
         }
 
         IEnumerator PunchDelay()
@@ -78,6 +119,7 @@ namespace Game.Scripts.LiveObjects
         private void OnDisable()
         {
             InteractableZone.onZoneInteractionComplete -= InteractableZone_onZoneInteractionComplete;
+            InteractableZone.OnHoldFinished -= BreakCrate;
         }
     }
 }
