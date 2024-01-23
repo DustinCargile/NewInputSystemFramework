@@ -63,6 +63,8 @@ namespace Game.Scripts.LiveObjects
 
         private void CalcutateMovement()
         {
+            //Input Manager Called
+
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");
             var direction = new Vector3(0, 0, v);
@@ -80,6 +82,7 @@ namespace Game.Scripts.LiveObjects
 
         private void LiftControls()
         {
+            //Input Manager Called
             if (Input.GetKey(KeyCode.R))
                 LiftUpRoutine();
             else if (Input.GetKey(KeyCode.T))

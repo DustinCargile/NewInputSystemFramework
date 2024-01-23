@@ -57,9 +57,12 @@ namespace Game.Scripts.Player
 
         private void CalcutateMovement()
         {
+            //Input Manager Called
             _playerGrounded = _controller.isGrounded;
-            float h = Input.GetAxisRaw("Horizontal");
-            float v = Input.GetAxisRaw("Vertical");
+            /*float h = Input.GetAxisRaw("Horizontal");
+            float v = Input.GetAxisRaw("Vertical");*/
+            float h = InputManager.Instance.GetPlayerMovement().x;
+            float v = InputManager.Instance.GetPlayerMovement().y;
 
             transform.Rotate(transform.up, h);
 

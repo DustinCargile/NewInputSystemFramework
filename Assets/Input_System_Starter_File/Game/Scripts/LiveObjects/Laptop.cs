@@ -33,6 +33,8 @@ namespace Game.Scripts.LiveObjects
         {
             if (_hacked == true)
             {
+                //Input Manager Called
+
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     var previous = _activeCamera;

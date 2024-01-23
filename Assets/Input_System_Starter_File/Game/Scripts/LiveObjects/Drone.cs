@@ -62,6 +62,7 @@ namespace Game.Scripts.LiveObjects
                 CalculateTilt();
                 CalculateMovementUpdate();
 
+                //Input Manager Called
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     _inFlightMode = false;
@@ -80,6 +81,7 @@ namespace Game.Scripts.LiveObjects
 
         private void CalculateMovementUpdate()
         {
+            //Input Manager Called
             if (Input.GetKey(KeyCode.LeftArrow))
             {
                 var tempRot = transform.localRotation.eulerAngles;
@@ -96,7 +98,7 @@ namespace Game.Scripts.LiveObjects
 
         private void CalculateMovementFixedUpdate()
         {
-            
+            //Input Manager Called
             if (Input.GetKey(KeyCode.Space))
             {
                 _rigidbody.AddForce(transform.up * _speed, ForceMode.Acceleration);
@@ -109,6 +111,7 @@ namespace Game.Scripts.LiveObjects
 
         private void CalculateTilt()
         {
+            //Input Manager Called
             if (Input.GetKey(KeyCode.A)) 
                 transform.rotation = Quaternion.Euler(00, transform.localRotation.eulerAngles.y, 30);
             else if (Input.GetKey(KeyCode.D))
