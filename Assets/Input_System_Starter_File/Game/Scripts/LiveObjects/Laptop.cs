@@ -23,10 +23,14 @@ namespace Game.Scripts.LiveObjects
         public static event Action onHackComplete;
         public static event Action onHackEnded;
 
+        private bool _isInteracting = false;
+        private bool _escapePressed = false;
         private void OnEnable()
         {
             InteractableZone.onHoldStarted += InteractableZone_onHoldStarted;
             InteractableZone.onHoldEnded += InteractableZone_onHoldEnded;
+            InputManager.OnInteract += HasInteraction;
+            InputManager.OnEscape += PressedEscape;
         }
 
         private void Update()
@@ -35,7 +39,7 @@ namespace Game.Scripts.LiveObjects
             {
                 //Input Manager Called
 
-                if (Input.GetKeyDown(KeyCode.E))
+                if (_isInteracting)
                 {
                     var previous = _activeCamera;
                     _activeCamera++;
@@ -47,9 +51,10 @@ namespace Game.Scripts.LiveObjects
 
                     _cameras[_activeCamera].Priority = 11;
                     _cameras[previous].Priority = 9;
+                    _isInteracting=false;
                 }
 
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (_escapePressed)
                 {
                     _hacked = false;
                     onHackEnded?.Invoke();
@@ -109,7 +114,14 @@ namespace Game.Scripts.LiveObjects
             //enable Vcam1
             _cameras[0].Priority = 11;
         }
-        
+        private void HasInteraction(bool interaction) 
+        {
+            _isInteracting = interaction;
+        }
+        private void PressedEscape(bool escape) 
+        {
+            _escapePressed = escape;
+        }
         private void OnDisable()
         {
             InteractableZone.onHoldStarted -= InteractableZone_onHoldStarted;

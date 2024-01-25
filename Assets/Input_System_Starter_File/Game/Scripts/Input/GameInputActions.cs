@@ -44,6 +44,15 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Escape"",
+                    ""type"": ""Button"",
+                    ""id"": ""6141e968-9c71-4a5b-8c0f-6c1fe5beea96"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -112,47 +121,10 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Interaction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                }
-            ]
-        },
-        {
-            ""name"": ""Laptop"",
-            ""id"": ""34de2b16-18ab-41e5-924b-a83ecdc5c803"",
-            ""actions"": [
-                {
-                    ""name"": ""Interact"",
-                    ""type"": ""Button"",
-                    ""id"": ""51302c64-4a74-457d-9568-eb98f3d22859"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Escape"",
-                    ""type"": ""Button"",
-                    ""id"": ""f1322911-b566-4fbc-b51e-830856ca60d3"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                }
-            ],
-            ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""cab072ba-2a4f-40e2-b2e6-dfec4a071dbd"",
-                    ""path"": ""<Keyboard>/e"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Interact"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""24ee576f-42a9-4fa7-9c54-19855811c231"",
+                    ""id"": ""8855ef38-3a84-4a79-9a45-62e318ecdac1"",
                     ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -170,10 +142,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
         m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
-        // Laptop
-        m_Laptop = asset.FindActionMap("Laptop", throwIfNotFound: true);
-        m_Laptop_Interact = m_Laptop.FindAction("Interact", throwIfNotFound: true);
-        m_Laptop_Escape = m_Laptop.FindAction("Escape", throwIfNotFound: true);
+        m_Player_Escape = m_Player.FindAction("Escape", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -237,12 +206,14 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Movement;
     private readonly InputAction m_Player_Interaction;
+    private readonly InputAction m_Player_Escape;
     public struct PlayerActions
     {
         private @GameInputActions m_Wrapper;
         public PlayerActions(@GameInputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Player_Movement;
         public InputAction @Interaction => m_Wrapper.m_Player_Interaction;
+        public InputAction @Escape => m_Wrapper.m_Player_Escape;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -258,6 +229,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @Interaction.started += instance.OnInteraction;
             @Interaction.performed += instance.OnInteraction;
             @Interaction.canceled += instance.OnInteraction;
+            @Escape.started += instance.OnEscape;
+            @Escape.performed += instance.OnEscape;
+            @Escape.canceled += instance.OnEscape;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -268,6 +242,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @Interaction.started -= instance.OnInteraction;
             @Interaction.performed -= instance.OnInteraction;
             @Interaction.canceled -= instance.OnInteraction;
+            @Escape.started -= instance.OnEscape;
+            @Escape.performed -= instance.OnEscape;
+            @Escape.canceled -= instance.OnEscape;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -285,68 +262,10 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
-
-    // Laptop
-    private readonly InputActionMap m_Laptop;
-    private List<ILaptopActions> m_LaptopActionsCallbackInterfaces = new List<ILaptopActions>();
-    private readonly InputAction m_Laptop_Interact;
-    private readonly InputAction m_Laptop_Escape;
-    public struct LaptopActions
-    {
-        private @GameInputActions m_Wrapper;
-        public LaptopActions(@GameInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Interact => m_Wrapper.m_Laptop_Interact;
-        public InputAction @Escape => m_Wrapper.m_Laptop_Escape;
-        public InputActionMap Get() { return m_Wrapper.m_Laptop; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(LaptopActions set) { return set.Get(); }
-        public void AddCallbacks(ILaptopActions instance)
-        {
-            if (instance == null || m_Wrapper.m_LaptopActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_LaptopActionsCallbackInterfaces.Add(instance);
-            @Interact.started += instance.OnInteract;
-            @Interact.performed += instance.OnInteract;
-            @Interact.canceled += instance.OnInteract;
-            @Escape.started += instance.OnEscape;
-            @Escape.performed += instance.OnEscape;
-            @Escape.canceled += instance.OnEscape;
-        }
-
-        private void UnregisterCallbacks(ILaptopActions instance)
-        {
-            @Interact.started -= instance.OnInteract;
-            @Interact.performed -= instance.OnInteract;
-            @Interact.canceled -= instance.OnInteract;
-            @Escape.started -= instance.OnEscape;
-            @Escape.performed -= instance.OnEscape;
-            @Escape.canceled -= instance.OnEscape;
-        }
-
-        public void RemoveCallbacks(ILaptopActions instance)
-        {
-            if (m_Wrapper.m_LaptopActionsCallbackInterfaces.Remove(instance))
-                UnregisterCallbacks(instance);
-        }
-
-        public void SetCallbacks(ILaptopActions instance)
-        {
-            foreach (var item in m_Wrapper.m_LaptopActionsCallbackInterfaces)
-                UnregisterCallbacks(item);
-            m_Wrapper.m_LaptopActionsCallbackInterfaces.Clear();
-            AddCallbacks(instance);
-        }
-    }
-    public LaptopActions @Laptop => new LaptopActions(this);
     public interface IPlayerActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnInteraction(InputAction.CallbackContext context);
-    }
-    public interface ILaptopActions
-    {
-        void OnInteract(InputAction.CallbackContext context);
         void OnEscape(InputAction.CallbackContext context);
     }
 }

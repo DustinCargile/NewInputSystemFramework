@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using Game.Scripts.LiveObjects;
 
 public class InputManager : MonoBehaviour
@@ -9,6 +10,9 @@ public class InputManager : MonoBehaviour
 
     private GameInputActions _input;
     private bool _interactionPressed = false;
+
+    public static Action<bool> OnInteract;
+    public static Action<bool> OnEscape;
 
     private void Awake()
     {
@@ -22,57 +26,69 @@ public class InputManager : MonoBehaviour
         }
 
         
+        
        
     }
     private void OnEnable()
     {
-        Laptop.onHackComplete += PlayerToLaptop;
-        Laptop.onHackEnded += LaptopToPlayer;
+        InitalizeInput();
     }
-    // Start is called before the first frame update
-    void Start()
+
+    private void InitalizeInput() 
     {
         _input = new GameInputActions();
         _input.Player.Enable();
         _input.Player.Interaction.performed += Interaction_performed;
         _input.Player.Interaction.canceled += Interaction_canceled;
-        
+
+        _input.Player.Escape.performed += Escape_performed;
+        _input.Player.Escape.canceled += Escape_canceled;
     }
 
-    private void Interaction_canceled(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    //=================Escape methods=========================
+    private void Escape_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        _interactionPressed = false;
+        OnEscape?.Invoke(false);
+    }
+
+    private void Escape_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        OnEscape?.Invoke(true);
+    }
+    //================Interaction methods=================================
+    private void Interaction_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        OnInteract?.Invoke(false);
     }
 
     private void Interaction_performed(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        _interactionPressed = true;
+        OnInteract?.Invoke(true);
     }
+
+    //==============Start and Update=================================
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+       
+        
+    }
+
 
     // Update is called once per frame
     void Update()
     {
         
     }
+
+    //=====================Public Methods======================
     public Vector2 GetPlayerMovement() 
     {
         return _input.Player.Movement.ReadValue<Vector2>();
     }
-    public bool IsInteractionPressed() 
-    {
-        return _interactionPressed; 
-    }
-
-    private void PlayerToLaptop() 
-    {
-        _input.Player.Disable();
-        _input.Laptop.Enable();
-    }
-    private void LaptopToPlayer() 
-    {
-        _input.Laptop.Disable();
-        _input.Player.Enable();
-    }
-
+  
+    
 
 }

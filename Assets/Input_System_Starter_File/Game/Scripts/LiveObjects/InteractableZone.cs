@@ -60,6 +60,8 @@ namespace Game.Scripts.LiveObjects
                          
             }
         }
+        private bool _isInteracting = false;
+        
 
 
         public static event Action<InteractableZone> onZoneInteractionComplete;
@@ -69,7 +71,7 @@ namespace Game.Scripts.LiveObjects
         private void OnEnable()
         {
             InteractableZone.onZoneInteractionComplete += SetMarker;
-
+            InputManager.OnInteract += HasInteraction;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -178,7 +180,7 @@ namespace Game.Scripts.LiveObjects
             {
                 //Input Manager Called
 
-                if (InputManager.Instance.IsInteractionPressed() && _keyState != KeyState.PressHold)
+                if ((_isInteracting) && _keyState != KeyState.PressHold)
                 {
                     //press
                     switch (_zoneType)
@@ -202,7 +204,7 @@ namespace Game.Scripts.LiveObjects
                             break;
                     }
                 }
-                else if (InputManager.Instance.IsInteractionPressed() && _keyState == KeyState.PressHold && _inHoldState == false)
+                else if (_isInteracting && _keyState == KeyState.PressHold && _inHoldState == false)
                 {
                     _inHoldState = true;
 
@@ -216,7 +218,7 @@ namespace Game.Scripts.LiveObjects
                     }
                 }
 
-                if (InputManager.Instance.IsInteractionPressed() && _keyState == KeyState.PressHold)
+                if (!_isInteracting && _keyState == KeyState.PressHold)
                 {
                     _inHoldState = false;
                     onHoldEnded?.Invoke(_zoneID);
@@ -302,9 +304,14 @@ namespace Game.Scripts.LiveObjects
             }
         }
 
+        private void HasInteraction(bool interaction) 
+        {
+            _isInteracting = interaction;
+        }
         private void OnDisable()
         {
             InteractableZone.onZoneInteractionComplete -= SetMarker;
+            InputManager.OnInteract -= HasInteraction;
         }       
         
     }
