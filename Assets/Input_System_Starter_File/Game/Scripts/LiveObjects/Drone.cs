@@ -66,7 +66,7 @@ namespace Game.Scripts.LiveObjects
                 CalculateMovementUpdate();
 
                 //Input Manager Called
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (_escapePressed)
                 {
                     _inFlightMode = false;
                     onExitFlightmode?.Invoke();

@@ -14,6 +14,9 @@ public class InputManager : MonoBehaviour
     public static Action<bool> OnInteract;
     public static Action<bool> OnEscape;
 
+    private float _duration = 0;
+    private float _holdTime = 0;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -49,10 +52,39 @@ public class InputManager : MonoBehaviour
 
         _input.Player.Escape.performed += Escape_performed;
         _input.Player.Escape.canceled += Escape_canceled;
-
+        _input.Player.HoldInteraction.performed += HoldInteraction_performed;
+        _input.Player.HoldInteraction.canceled += HoldInteraction_canceled;
+        _input.Player.HoldInteraction.started += HoldInteraction_started;
         _input.Drone.Escape.performed += Escape_performed;
+        
 
         
+    }
+
+    private void HoldInteraction_started(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        _duration = 1;
+        _holdTime = 0;
+    }
+
+    private void HoldInteraction_canceled(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        if (_holdTime > 0 && _holdTime < 6)
+        {
+            _duration = _holdTime;
+        }
+        else 
+        {
+            _duration = 0;
+        }
+        _holdTime = 0;
+        
+        
+    }
+
+    private void HoldInteraction_performed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        //_duration = 5;
     }
 
     //=================Escape methods=========================
@@ -90,6 +122,8 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log("Duration is: " + _duration);
+        _holdTime += Time.deltaTime;
         
     }
 
@@ -145,4 +179,7 @@ public class InputManager : MonoBehaviour
         Drone.OnEnterFlightMode -= ActivateDroneControls;
         Drone.onExitFlightmode -= DeactivateDroneControls;
     }
+
+    //-----------------Crate Interactions------------------------
+    public int GetDuration() { return (int)_duration; }
 }

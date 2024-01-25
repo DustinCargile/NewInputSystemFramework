@@ -34,7 +34,7 @@ namespace Game.Scripts.LiveObjects
             {
                 if (_brakeOff.Count > 0)
                 {
-                    BreakPart();
+                    BreakPart(InputManager.Instance.GetDuration());
                     StartCoroutine(PunchDelay());
                 }
                 else if(_brakeOff.Count == 0)
@@ -55,12 +55,19 @@ namespace Game.Scripts.LiveObjects
 
 
 
-        public void BreakPart()
+        public void BreakPart(int parts)
         {
-            int rng = Random.Range(0, _brakeOff.Count);
+            /*int rng = Random.Range(0, _brakeOff.Count);
             _brakeOff[rng].constraints = RigidbodyConstraints.None;
             _brakeOff[rng].AddForce(new Vector3(1f, 1f, 1f), ForceMode.Force);
-            _brakeOff.Remove(_brakeOff[rng]);            
+            _brakeOff.Remove(_brakeOff[rng]); */
+            for (int i = 0; i < parts; i++) 
+            {
+                int rng = Random.Range(0, _brakeOff.Count);
+                _brakeOff[rng].constraints = RigidbodyConstraints.None;
+                _brakeOff[rng].AddForce(new Vector3(1f, 1f, 1f), ForceMode.Force);
+                _brakeOff.Remove(_brakeOff[rng]);
+            }
         }
 
         IEnumerator PunchDelay()
