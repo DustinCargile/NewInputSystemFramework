@@ -16,6 +16,9 @@ public class InputManager : MonoBehaviour
 
     private float _duration = 0;
     private float _holdTime = 0;
+    private bool _holding = false;
+
+    public static event Action<int> OnBreakCrate;
 
     private void Awake()
     {
@@ -56,35 +59,31 @@ public class InputManager : MonoBehaviour
         _input.Player.HoldInteraction.canceled += HoldInteraction_canceled;
         _input.Player.HoldInteraction.started += HoldInteraction_started;
         _input.Drone.Escape.performed += Escape_performed;
-        
+        _input.Drone.Escape.canceled += Escape_canceled;
+        _input.Forklift.Escape.performed += Escape_performed;
+        _input.Forklift.Escape.canceled += Escape_canceled;
 
         
     }
 
+   
+
     private void HoldInteraction_started(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        _duration = 1;
-        _holdTime = 0;
+        
     }
 
     private void HoldInteraction_canceled(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        if (_holdTime > 0 && _holdTime < 6)
-        {
-            _duration = _holdTime;
-        }
-        else 
-        {
-            _duration = 0;
-        }
-        _holdTime = 0;
-        
-        
+        OnBreakCrate?.Invoke(Mathf.Clamp((int)context.duration, 1, 4));
+
+
     }
 
     private void HoldInteraction_performed(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        //_duration = 5;
+
+        OnBreakCrate?.Invoke(Mathf.Clamp((int)context.duration,1,4));
     }
 
     //=================Escape methods=========================
@@ -122,7 +121,6 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Duration is: " + _duration);
         _holdTime += Time.deltaTime;
         
     }
@@ -152,6 +150,8 @@ public class InputManager : MonoBehaviour
     public Vector2 GetForkliftMovement() { return _input.Forklift.Movement.ReadValue<Vector2>(); }
 
     public float GetForkliftRaiseLower() {return _input.Forklift.LiftControls.ReadValue<float>(); }
+
+    
     //=====================Private Methods====================
 
     ///////////Drone Controls////////////

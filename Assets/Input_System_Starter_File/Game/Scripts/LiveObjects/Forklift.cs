@@ -17,6 +17,8 @@ namespace Game.Scripts.LiveObjects
         [SerializeField]
         private GameObject _driverModel;
         private bool _inDriveMode = false;
+
+        private bool _escapePressed = false;
         [SerializeField]
         private InteractableZone _interactableZone;
 
@@ -26,6 +28,7 @@ namespace Game.Scripts.LiveObjects
         private void OnEnable()
         {
             InteractableZone.onZoneInteractionComplete += EnterDriveMode;
+            InputManager.OnEscape += EscapePressed;
         }
 
         private void EnterDriveMode(InteractableZone zone)
@@ -55,8 +58,10 @@ namespace Game.Scripts.LiveObjects
             {
                 LiftControls();
                 CalcutateMovement();
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (_escapePressed) 
+                {
                     ExitDriveMode();
+                }
             }
 
         }
@@ -120,10 +125,14 @@ namespace Game.Scripts.LiveObjects
             else if (_lift.transform.localPosition.y <= _liftUpperLimit.y)
                 _lift.transform.localPosition = _liftLowerLimit;
         }
-
+        private void EscapePressed(bool escape) 
+        {
+            _escapePressed = escape;
+        }
         private void OnDisable()
         {
             InteractableZone.onZoneInteractionComplete -= EnterDriveMode;
+            InputManager.OnEscape += EscapePressed;
         }
 
     }
