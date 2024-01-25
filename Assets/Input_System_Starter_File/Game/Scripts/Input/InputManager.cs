@@ -32,6 +32,12 @@ public class InputManager : MonoBehaviour
     private void OnEnable()
     {
         InitalizeInput();
+
+        Drone.OnEnterFlightMode += ActivateDroneControls;
+        Drone.onExitFlightmode += DeactivateDroneControls;
+
+        Forklift.onDriveModeEntered += ActivateForkliftControls;
+        Forklift.onDriveModeExited += DeactivateForkliftContols;
     }
 
     private void InitalizeInput() 
@@ -43,6 +49,10 @@ public class InputManager : MonoBehaviour
 
         _input.Player.Escape.performed += Escape_performed;
         _input.Player.Escape.canceled += Escape_canceled;
+
+        _input.Drone.Escape.performed += Escape_performed;
+
+        
     }
 
     //=================Escape methods=========================
@@ -88,7 +98,51 @@ public class InputManager : MonoBehaviour
     {
         return _input.Player.Movement.ReadValue<Vector2>();
     }
-  
+
+    ///////////////////////DroneMovement//////////////////
+    public Vector2 GetDroneInput() 
+    {
+        
+        return _input.Drone.Movement.ReadValue<Vector2>(); 
+    }
+    public float GetDroneRotate() 
+    {
+        return _input.Drone.Rotate.ReadValue<float>();
+    }
+    public float GetDroneLift() 
+    { 
+        return _input.Drone.Lift.ReadValue<float>();
+    }
+
+    //|-------------Forklift Movemnt---------------------|
+    public Vector2 GetForkliftMovement() { return _input.Forklift.Movement.ReadValue<Vector2>(); }
+
+    public float GetForkliftRaiseLower() {return _input.Forklift.LiftControls.ReadValue<float>(); }
+    //=====================Private Methods====================
+
+    ///////////Drone Controls////////////
+    private void ActivateDroneControls() 
+    {
+        _input.Drone.Enable();
+        _input.Player.Disable();
+    }
+    private void DeactivateDroneControls() 
+    {
+        _input.Drone.Disable();
+        _input.Player.Enable();
+    }
+
+
+    //|----------Forklift Controls--------------------------|
+    private void ActivateForkliftControls() { _input.Forklift.Enable(); _input.Player.Disable(); }
+    private void DeactivateForkliftContols() { _input.Forklift.Disable(); _input.Player.Enable(); }
+    
     
 
+    //====================Disable Method============================
+    private void OnDisable()
+    {
+        Drone.OnEnterFlightMode -= ActivateDroneControls;
+        Drone.onExitFlightmode -= DeactivateDroneControls;
+    }
 }

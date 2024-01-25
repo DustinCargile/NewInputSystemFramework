@@ -64,9 +64,11 @@ namespace Game.Scripts.LiveObjects
         private void CalcutateMovement()
         {
             //Input Manager Called
-
-            float h = Input.GetAxisRaw("Horizontal");
-            float v = Input.GetAxisRaw("Vertical");
+            Vector2 move = InputManager.Instance.GetForkliftMovement();
+           /* float h = Input.GetAxisRaw("Horizontal");
+            float v = Input.GetAxisRaw("Vertical");*/
+            float h = move.x;
+            float v = move.y;
             var direction = new Vector3(0, 0, v);
             var velocity = direction * _speed;
 
@@ -83,9 +85,15 @@ namespace Game.Scripts.LiveObjects
         private void LiftControls()
         {
             //Input Manager Called
-            if (Input.GetKey(KeyCode.R))
+            /*if (Input.GetKey(KeyCode.R))
                 LiftUpRoutine();
             else if (Input.GetKey(KeyCode.T))
+                LiftDownRoutine();*/
+            float direction = InputManager.Instance.GetForkliftRaiseLower();
+
+            if (direction == 1f)
+                LiftUpRoutine();
+            else if (direction == -1f)
                 LiftDownRoutine();
         }
 
