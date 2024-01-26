@@ -64,6 +64,10 @@ namespace Game.Scripts.LiveObjects
             _brakeOff[rng].constraints = RigidbodyConstraints.None;
             _brakeOff[rng].AddForce(new Vector3(1f, 1f, 1f), ForceMode.Force);
             _brakeOff.Remove(_brakeOff[rng]); */
+            if (_zone == null) 
+            {
+                return;
+            }
             for (int i = 0; i < parts; i++) 
             {
                 if (_zone.GetZoneID() == 6 && _isReadyToBreak) 
