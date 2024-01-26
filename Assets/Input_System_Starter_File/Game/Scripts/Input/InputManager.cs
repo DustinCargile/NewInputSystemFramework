@@ -14,9 +14,7 @@ public class InputManager : MonoBehaviour
     public static Action<bool> OnInteract;
     public static Action<bool> OnEscape;
 
-    private float _duration = 0;
-    private float _holdTime = 0;
-    private bool _holding = false;
+    
 
     public static event Action<int> OnBreakCrate;
 
@@ -121,7 +119,7 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _holdTime += Time.deltaTime;
+
         
     }
 
@@ -180,6 +178,5 @@ public class InputManager : MonoBehaviour
         Drone.onExitFlightmode -= DeactivateDroneControls;
     }
 
-    //-----------------Crate Interactions------------------------
-    public int GetDuration() { return (int)_duration; }
+
 }
